@@ -26,7 +26,7 @@ defmodule ElixiratorChallengeWeb.FuelLive do
         <:subtitle>Enter the spacecraft mass and build a flight path.</:subtitle>
       </.header>
 
-      <.form for={@form} id="mission-form" phx-change="change" class="space-y-6">
+      <.form for={@form} id="mission-form" phx-change="change" phx-submit="change" class="space-y-6">
         <.input
           autocomplete="off"
           field={@form[:mass]}

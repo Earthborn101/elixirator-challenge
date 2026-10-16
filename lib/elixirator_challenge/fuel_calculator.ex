@@ -126,7 +126,7 @@ defmodule ElixiratorChallenge.FuelCalculator do
 
   defp validate_step_action({:ok, %{step_id: id} = params, errors}, _steps) when is_integer(id) do
     {:error, params,
-     Map.put(errors, :action, "Step #{id} has an invalid action. It's must be launch or land.")}
+     Map.put(errors, :action, "Step #{id} has an invalid action. It must be launch or land.")}
   end
 
   defp validate_step_action({:error, _, _} = step_params, _steps) do
