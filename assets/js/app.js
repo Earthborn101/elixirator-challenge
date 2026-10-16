@@ -25,13 +25,25 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/elixirator_challenge"
 import topbar from "../vendor/topbar"
 
-let Hooks = {}
+const Hooks = {
+  IntegerOnly: {
+    mounted() {
+      this.el.addEventListener("input", () => {
+        const sanitized = this.el.value.replace(/[^0-9]/g, "")
+
+        if (this.el.value !== sanitized) {
+          this.el.value = sanitized
+        }
+      })
+    }
+  }
+}
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: Hooks,
+  hooks: {...colocatedHooks, ...Hooks},
 })
 
 // Show progress bar on live navigation and form submits
@@ -81,17 +93,4 @@ if (process.env.NODE_ENV === "development") {
 
     window.liveReloader = reloader
   })
-}
-
-Hooks.IntegerOnly = {
-  mounted() {
-    this.el.addEventListener("input", (event) => {
-      const sanitized = this.el.value.replace(/[^0-9]/g, "")
-
-      if (this.el.value !== sanitized) {
-        this.el.value = sanitized
-        this.el.dispatchEvent(new Event("input", { bubbles: true }))
-      }
-    })
-  }
 }
