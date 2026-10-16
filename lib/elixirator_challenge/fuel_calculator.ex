@@ -78,7 +78,7 @@ defmodule ElixiratorChallenge.FuelCalculator do
     params
   end
 
-  defp validate_flight_path({_, %{flight_path: flight_path} = params, errors})
+  defp validate_flight_path({status, %{flight_path: flight_path} = params, errors})
        when is_list(flight_path) do
     return_result =
       flight_path
@@ -88,6 +88,7 @@ defmodule ElixiratorChallenge.FuelCalculator do
           |> validate_step_id(steps)
           |> validate_step_action(steps)
           |> validate_step_planet()
+          |> validate_step_location(steps)
 
         case return_result do
           {:ok, step_params, _} ->
@@ -100,7 +101,7 @@ defmodule ElixiratorChallenge.FuelCalculator do
 
     case return_result do
       {_step_list, []} ->
-        {:ok, params, errors}
+        {status, params, errors}
 
       {_step_list, error_steps} ->
         {:error, params, Map.put(errors, :flight_path, error_steps)}
@@ -183,6 +184,29 @@ defmodule ElixiratorChallenge.FuelCalculator do
   end
 
   defp validate_step_planet({:error, _, _} = step_params) do
+    step_params
+  end
+
+  defp validate_step_location(
+         {:ok, %{action: "launch", planet: planet, step_id: step_id} = params, errors} =
+           step_params,
+         steps
+       ) do
+    case List.last(steps) do
+      %{action: "land", planet: landed_planet} when landed_planet != planet ->
+        {:error, params,
+         Map.put(
+           errors,
+           :planet,
+           "Step #{step_id} has an invalid planet. The spacecraft must launch from #{landed_planet}, where it last landed."
+         )}
+
+      _ ->
+        step_params
+    end
+  end
+
+  defp validate_step_location(step_params, _steps) do
     step_params
   end
 

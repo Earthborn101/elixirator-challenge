@@ -10,20 +10,10 @@ defmodule ElixiratorChallengeWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
-
-  scope "/api", ElixiratorChallengeWeb do
-    pipe_through :api
-
-    post "/fuel", FuelController, :calculate
-  end
-
   scope "/", ElixiratorChallengeWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", FuelLive
   end
 
   # Other scopes may use custom stacks.
